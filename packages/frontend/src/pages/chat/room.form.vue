@@ -155,14 +155,14 @@ function onDrop(ev: DragEvent): void {
 
 function onKeydown(ev: KeyboardEvent) {
 	if (ev.key === 'Enter') {
-		if (prefer.s['chat.sendOnEnter']) {
-			if (!(ev.ctrlKey || ev.metaKey || ev.shiftKey)) {
-				send();
-			}
+		// New behavior: Enter sends, Shift+Enter inserts newline
+		if (ev.shiftKey) {
+			// allow default newline
+			return;
 		} else {
-			if ((ev.ctrlKey || ev.metaKey)) {
-				send();
-			}
+			// prevent newline and send message
+			ev.preventDefault();
+			if (!sending.value) send();
 		}
 	}
 }
