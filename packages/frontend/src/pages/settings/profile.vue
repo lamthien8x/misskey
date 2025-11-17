@@ -81,8 +81,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 							itemKey="id"
 							:animation="150"
 							:handle="'.' + $style.dragItemHandle"
-							@start="e => e.item.classList.add('active')"
-							@end="e => e.item.classList.remove('active')"
+							@start="onFieldDragStart"
+							@end="onFieldDragEnd"
 						>
 							<template #item="{element, index}">
 								<div v-panel :class="$style.fieldDragItem">
@@ -243,7 +243,7 @@ function save() {
 		// 空文字列をnullにしたいので??は使うな
 		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		name: profile.name || null,
-		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
 		description: profile.description || null,
 		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		followedMessage: profile.followedMessage || null,
@@ -270,8 +270,16 @@ function save() {
 	}
 }
 
-function changeAvatar(ev) {
-	async function done(driveFile) {
+function onFieldDragStart(evt: unknown) {
+	try { (evt as { item?: HTMLElement }).item?.classList.add('active'); } catch {}
+}
+
+function onFieldDragEnd(evt: unknown) {
+	try { (evt as { item?: HTMLElement }).item?.classList.remove('active'); } catch {}
+}
+
+function changeAvatar(ev: MouseEvent) {
+	async function done(driveFile: any) {
 		const i = await os.apiWithDialog('i/update', {
 			avatarId: driveFile.id,
 		});
@@ -319,8 +327,8 @@ function changeAvatar(ev) {
 	}], ev.currentTarget ?? ev.target);
 }
 
-function changeBanner(ev) {
-	async function done(driveFile) {
+function changeBanner(ev: MouseEvent) {
+	async function done(driveFile: any) {
 		const i = await os.apiWithDialog('i/update', {
 			bannerId: driveFile.id,
 		});
@@ -367,16 +375,12 @@ function changeBanner(ev) {
 	}], ev.currentTarget ?? ev.target);
 }
 
-const headerActions = computed(() => []);
-
-const headerTabs = computed(() => []);
-
 definePage(() => ({
 	title: i18n.ts.profile,
 	icon: 'ti ti-user',
 }));
-</script>
 
+</script>
 <style lang="scss" module>
 .banner {
 	position: relative;

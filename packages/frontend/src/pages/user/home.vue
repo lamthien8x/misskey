@@ -187,6 +187,45 @@ import MkSparkle from '@/components/MkSparkle.vue';
 import { prefer } from '@/preferences.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 
+// Paid follow helpers
+const paidFollowPriceVnd = computed(() => {
+	const price = Number((user.value as any)?.followPriceAmountVnd ?? 0);
+	return Number.isFinite(price) ? price : 0;
+});
+const paidFollowLabel = computed(() => {
+	return paidFollowPriceVnd.value > 0
+		? `Follow — ${paidFollowPriceVnd.value.toLocaleString('vi-VN')}₫/30d`
+		: i18n.ts.follow;
+});
+
+async function openPaidFollow() {
+	// Only local instance allowed and require payment
+	if (paidFollowPriceVnd.value <= 0) return;
+	const { canceled } = await os.confirm({
+		type: 'question',
+		title: i18n.ts.follow,
+		text: `Bạn sẽ thanh toán ${paidFollowPriceVnd.value.toLocaleString('vi-VN')}₫ để theo dõi trong 30 ngày.\nKhông hỗ trợ hoàn tiền. Tiếp tục?`,
+		okText: i18n.ts.ok,
+		cancelText: i18n.ts.cancel,
+	});
+	if (canceled) return;
+	try {
+		// Backend will return clientSecret for Stripe
+		const intent = await (os.apiWithDialog as any)('follow/payment-intent', { targetUserId: user.value.id });
+		// TODO: Integrate Stripe Elements here using returned clientSecret
+		await os.alert({
+			title: 'Thanh toán',
+			text: 'Tính năng thanh toán Stripe sẽ được hiển thị ở bước tiếp theo (đang tích hợp).',
+		});
+		// After payment success, call confirm endpoint to finalize follow
+		// await (os.apiWithDialog as any)('follow/confirm', { targetUserId: user.value.id, paymentIntentId: intent.id });
+		// Optionally refresh user relationship state
+		// user.value = await misskeyApi('users/show', { userId: user.value.id });
+	} catch (err) {
+		// Show error via dialog (os.apiWithDialog already shows when possible)
+	}
+}
+
 function calcAge(birthdate: string): number {
 	const date = new Date(birthdate);
 	const now = new Date();

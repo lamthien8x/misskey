@@ -34,14 +34,13 @@ export const navbarItemDef = reactive({
 	drive: {
 		title: i18n.ts.drive,
 		icon: 'ti ti-cloud',
-		show: computed(() => $i != null),
+		show: computed(() => false), // hidden per request
 		to: '/my/drive',
 	},
 	followRequests: {
 		title: i18n.ts.followRequests,
 		icon: 'ti ti-user-plus',
-		indicated: computed(() => $i != null && $i.hasPendingReceivedFollowRequest),
-		to: '/my/follow-requests',
+		show: computed(() => false), // hidden per request		to: '/my/follow-requests',
 	},
 	explore: {
 		title: i18n.ts.explore,
@@ -54,11 +53,11 @@ export const navbarItemDef = reactive({
 		indicated: computed(() => $i != null && $i.hasUnreadAnnouncement),
 		to: '/announcements',
 	},
-	search: {
-		title: i18n.ts.search,
-		icon: 'ti ti-search',
-		to: '/search',
-	},
+	// search: {
+	// 	title: i18n.ts.search,
+	// 	icon: 'ti ti-search',
+	// 	to: '/search',
+	// },
 	lookup: {
 		title: i18n.ts.lookup,
 		icon: 'ti ti-world-search',
@@ -78,16 +77,16 @@ export const navbarItemDef = reactive({
 		show: computed(() => $i != null),
 		to: '/my/lists',
 	},
-	antennas: {
-		title: i18n.ts.antennas,
-		icon: 'ti ti-antenna',
-		show: computed(() => $i != null),
-		to: '/my/antennas',
-	},
+	// antennas: {
+	// 	title: i18n.ts.antennas,
+	// 	icon: 'ti ti-antenna',
+	// 	show: computed(() => $i != null),
+	// 	to: '/my/antennas',
+	// },
 	favorites: {
 		title: i18n.ts.favorites,
 		icon: 'ti ti-star',
-		show: computed(() => $i != null),
+		show: computed(() => false), // hidden per request
 		to: '/my/favorites',
 	},
 	pages: {
@@ -95,11 +94,11 @@ export const navbarItemDef = reactive({
 		icon: 'ti ti-news',
 		to: '/pages',
 	},
-	play: {
-		title: 'Play',
-		icon: 'ti ti-player-play',
-		to: '/play',
-	},
+	// play: {
+	// 	title: 'Play',
+	// 	icon: 'ti ti-player-play',
+	// 	to: '/play',
+	// },
 	gallery: {
 		title: i18n.ts.gallery,
 		icon: 'ti ti-icons',
@@ -108,8 +107,7 @@ export const navbarItemDef = reactive({
 	clips: {
 		title: i18n.ts.clip,
 		icon: 'ti ti-paperclip',
-		show: computed(() => $i != null),
-		to: '/my/clips',
+		show: computed(() => false), // hidden per request		to: '/my/clips',
 	},
 	channels: {
 		title: i18n.ts.channel,
@@ -129,32 +127,32 @@ export const navbarItemDef = reactive({
 		show: computed(() => $i != null),
 		to: '/my/achievements',
 	},
-	games: {
-		title: 'Misskey Games',
-		icon: 'ti ti-device-gamepad',
-		to: '/games',
-	},
-	ui: {
-		title: i18n.ts.switchUi,
-		icon: 'ti ti-devices',
-		action: (ev: MouseEvent) => {
-			os.popupMenu([{
-				text: i18n.ts.default,
-				active: ui === 'default' || ui === null,
-				action: () => {
-					miLocalStorage.setItem('ui', 'default');
-					unisonReload();
-				},
-			}, {
-				text: i18n.ts.deck,
-				active: ui === 'deck',
-				action: () => {
-					miLocalStorage.setItem('ui', 'deck');
-					unisonReload();
-				},
-			}], ev.currentTarget ?? ev.target);
-		},
-	},
+	// games: {
+	// 	title: 'Misskey Games',
+	// 	icon: 'ti ti-device-gamepad',
+	// 	to: '/games',
+	// },
+	// ui: {
+	// 	title: i18n.ts.switchUi,
+	// 	icon: 'ti ti-devices',
+	// 	action: (ev: MouseEvent) => {
+	// 		os.popupMenu([{
+	// 			text: i18n.ts.default,
+	// 			active: ui === 'default' || ui === null,
+	// 			action: () => {
+	// 				miLocalStorage.setItem('ui', 'default');
+	// 				unisonReload();
+	// 			},
+	// 		}, {
+	// 			text: i18n.ts.deck,
+	// 			active: ui === 'deck',
+	// 			action: () => {
+	// 				miLocalStorage.setItem('ui', 'deck');
+	// 				unisonReload();
+	// 			},
+	// 		}], ev.currentTarget ?? ev.target);
+	// 	},
+	// },
 	about: {
 		title: i18n.ts.about,
 		icon: 'ti ti-info-circle',

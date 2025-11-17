@@ -81,6 +81,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		to: '/settings/profile',
 		active: currentPage.value?.route.name === 'profile',
 	}, {
+		icon: 'ti ti-credit-card',
+		text: 'Thiết lập giá theo dõi',
+		to: '/settings/paid-follow',
+		active: currentPage.value?.route.name === 'paid-follow',
+	}, {
 		icon: 'ti ti-lock-open',
 		text: i18n.ts.privacy,
 		to: '/settings/privacy',
