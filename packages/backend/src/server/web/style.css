@@ -75,4 +75,8 @@ html {
 	100% {
 		transform: rotate(360deg);
 	}
+
+}
+.github-corner {
+    display: none !important;
 }
