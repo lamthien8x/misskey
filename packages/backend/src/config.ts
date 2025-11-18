@@ -64,6 +64,12 @@ type Source = {
 		index: string;
 		scope?: 'local' | 'global' | string[];
 	};
+
+	sepay?: {
+		baseUrl: string;
+		apiKey: string;
+		verifyEndpoint?: string;
+	};
 	sentryForBackend?: { options: Partial<Sentry.NodeOptions>; enableNodeProfiling: boolean; };
 	sentryForFrontend?: {
 		options: Partial<SentryVue.BrowserOptions> & { dsn: string };
@@ -151,6 +157,11 @@ export type Config = {
 		index: string;
 		scope?: 'local' | 'global' | string[];
 	} | undefined;
+	sepay?: {
+		baseUrl: string;
+		apiKey: string;
+		verifyEndpoint?: string;
+	};
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
 	proxyBypassHosts: string[] | undefined;
@@ -285,6 +296,16 @@ export function loadConfig(): Config {
 		dbSlaves: config.dbSlaves,
 		fulltextSearch: config.fulltextSearch,
 		meilisearch: config.meilisearch,
+		sepay: (() => {
+			const env = process.env.SEPAY_ENV ?? 'sandbox';
+			const merchantId = process.env.SEPAY_MERCHANT_ID;
+			const secretKey = process.env.SEPAY_SECRET_KEY;
+			const qrAccount = process.env.SEPAY_QR_ACCOUNT;
+			const qrBank = process.env.SEPAY_QR_BANK;
+			const qrBase = process.env.SEPAY_QR_BASE ?? 'https://qr.sepay.vn/img';
+			if (!merchantId || !secretKey) return undefined;
+			return { env, merchantId, secretKey, qrAccount, qrBank, qrBase };
+		})(),
 		redis,
 		redisForPubsub: config.redisForPubsub ? convertRedisOptions(config.redisForPubsub, host) : redis,
 		redisForJobQueue: config.redisForJobQueue ? convertRedisOptions(config.redisForJobQueue, host) : redis,

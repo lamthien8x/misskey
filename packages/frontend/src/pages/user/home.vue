@@ -87,20 +87,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<p v-else class="empty">{{ i18n.ts.noAccountDescription }}</p>
 							</MkOmit>
 						</div>
-						<div class="fields system">
-							<dl v-if="user.location" class="field">
-								<dt class="name"><i class="ti ti-map-pin ti-fw"></i> {{ i18n.ts.location }}</dt>
-								<dd class="value">{{ user.location }}</dd>
-							</dl>
-							<dl v-if="user.birthday" class="field">
-								<dt class="name"><i class="ti ti-cake ti-fw"></i> {{ i18n.ts.birthday }}</dt>
-								<dd class="value">{{ user.birthday.replace('-', '/').replace('-', '/') }} ({{ i18n.tsx.yearsOld({ age }) }})</dd>
-							</dl>
-							<dl class="field">
-								<dt class="name"><i class="ti ti-calendar ti-fw"></i> {{ i18n.ts.registeredDate }}</dt>
-								<dd class="value">{{ dateString(user.createdAt) }} (<MkTime :time="user.createdAt"/>)</dd>
-							</dl>
-						</div>
+					<div class="fields system">
+						<dl v-if="user.location" class="field">
+							<dt class="name"><i class="ti ti-map-pin ti-fw"></i> {{ i18n.ts.location }}</dt>
+							<dd class="value">{{ user.location }}</dd>
+						</dl>
+						<dl v-if="user.birthday" class="field">
+							<dt class="name"><i class="ti ti-cake ti-fw"></i> {{ i18n.ts.birthday }}</dt>
+							<dd class="value">{{ user.birthday.replace('-', '/').replace('-', '/') }} ({{ i18n.tsx.yearsOld({ age }) }})</dd>
+						</dl>
+						<dl v-if="paidFollowPriceVnd > 0" class="field">
+							<dt class="name"><i class="ti ti-currency-dollar ti-fw"></i> Giá theo dõi</dt>
+							<dd class="value">{{ paidFollowPriceVnd.toLocaleString('vi-VN') }}₫ / 30 ngày</dd>
+						</dl>
+						<dl class="field">
+							<dt class="name"><i class="ti ti-calendar ti-fw"></i> {{ i18n.ts.registeredDate }}</dt>
+							<dd class="value">{{ dateString(user.createdAt) }} (<MkTime :time="user.createdAt"/>)</dd>
+						</dl>
+					</div>
 						<div v-if="user.fields.length > 0" class="fields">
 							<dl v-for="(field, i) in user.fields" :key="i" class="field">
 								<dt class="name">

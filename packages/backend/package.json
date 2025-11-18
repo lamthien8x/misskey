@@ -68,7 +68,7 @@
 		"slacc-win32-x64-msvc": "0.0.10",
 		"utf-8-validate": "6.0.5"
 	},
-	"dependencies": {
+  "dependencies": {
 		"@aws-sdk/client-s3": "3.922.0",
 		"@aws-sdk/lib-storage": "3.922.0",
 		"@discordapp/twemoji": "16.0.1",
@@ -186,8 +186,9 @@
 		"vary": "1.1.2",
 		"web-push": "3.6.7",
 		"ws": "8.18.3",
-		"xev": "3.0.2"
-	},
+    		"xev": "3.0.2",
+    		"sepay-pg-node": "github:sepayvn/sepay-pg-node"
+    	},
 	"devDependencies": {
 		"@jest/globals": "29.7.0",
 		"@nestjs/platform-express": "10.4.20",
@@ -244,5 +245,5 @@
 		"pid-port": "1.0.2",
 		"simple-oauth2": "5.1.0",
 		"supertest": "7.1.4"
-	}
+  }
 }

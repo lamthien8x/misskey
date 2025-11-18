@@ -137,8 +137,8 @@ const muteWords = { type: 'array', items: { oneOf: [
 ] } } as const;
 
 export const paramDef = {
-	type: 'object',
-	properties: {
+    type: 'object',
+    properties: {
 		name: { ...nameSchema, nullable: true },
 		description: { ...descriptionSchema, nullable: true },
 		followedMessage: { ...followedMessageSchema, nullable: true },
@@ -191,7 +191,9 @@ export const paramDef = {
 		followingVisibility: { type: 'string', enum: ['public', 'followers', 'private'] },
 		followersVisibility: { type: 'string', enum: ['public', 'followers', 'private'] },
 		chatScope: { type: 'string', enum: ['everyone', 'followers', 'following', 'mutual', 'none'] },
-		pinnedPageId: { type: 'string', format: 'misskey:id', nullable: true },
+		followPriceMonthly: { type: 'integer', minimum: 0 },
+		followPriceAmountVnd: { type: 'integer', minimum: 0 },
+        pinnedPageId: { type: 'string', format: 'misskey:id', nullable: true },
 		mutedWords: muteWords,
 		hardMutedWords: muteWords,
 		mutedInstances: { type: 'array', items: {
@@ -336,7 +338,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;
 			if (typeof ps.isExplorable === 'boolean') updates.isExplorable = ps.isExplorable;
 			if (typeof ps.hideOnlineStatus === 'boolean') updates.hideOnlineStatus = ps.hideOnlineStatus;
-			if (typeof ps.publicReactions === 'boolean') profileUpdates.publicReactions = ps.publicReactions;
+        if (typeof ps.publicReactions === 'boolean') profileUpdates.publicReactions = ps.publicReactions;
 			if (typeof ps.isBot === 'boolean') updates.isBot = ps.isBot;
 			if (typeof ps.carefulBot === 'boolean') profileUpdates.carefulBot = ps.carefulBot;
 			if (typeof ps.autoAcceptFollowed === 'boolean') profileUpdates.autoAcceptFollowed = ps.autoAcceptFollowed;
@@ -348,6 +350,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (typeof ps.isCat === 'boolean') updates.isCat = ps.isCat;
 			if (typeof ps.injectFeaturedNote === 'boolean') profileUpdates.injectFeaturedNote = ps.injectFeaturedNote;
 			if (typeof ps.receiveAnnouncementEmail === 'boolean') profileUpdates.receiveAnnouncementEmail = ps.receiveAnnouncementEmail;
+			if (typeof ps.followPriceMonthly === 'number') {
+				const value = Math.max(0, Math.floor(ps.followPriceMonthly));
+				profileUpdates.followPriceMonthly = value;
+			}
+			if (typeof ps.followPriceAmountVnd === 'number') {
+				const value = Math.max(0, Math.floor(ps.followPriceAmountVnd));
+				profileUpdates.followPriceMonthly = value;
+			}
 			if (typeof ps.alwaysMarkNsfw === 'boolean') {
 				policies ??= await this.roleService.getUserPolicies(user.id);
 				if (policies.alwaysMarkNsfw) throw new ApiError(meta.errors.restrictedByRole);

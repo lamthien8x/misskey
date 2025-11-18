@@ -28,7 +28,7 @@ export const meta = {
 
 	kind: 'write:following',
 
-	errors: {
+		errors: {
 		noSuchUser: {
 			message: 'No such user.',
 			code: 'NO_SUCH_USER',
@@ -53,12 +53,18 @@ export const meta = {
 			id: '4e2206ec-aa4f-4960-b865-6c23ac38e2d9',
 		},
 
-		blocked: {
-			message: 'You are blocked by that user.',
-			code: 'BLOCKED',
-			id: 'c4ab57cc-4e41-45e9-bfd9-584f61e35ce0',
+			blocked: {
+				message: 'You are blocked by that user.',
+				code: 'BLOCKED',
+				id: 'c4ab57cc-4e41-45e9-bfd9-584f61e35ce0',
+			},
+
+			paidFollowRequired: {
+				message: 'Paid follow required by target user.',
+				code: 'PAID_FOLLOW_REQUIRED',
+				id: '24bd3d1e-19d2-4b64-b2f1-8e2bff16c8b2',
+			},
 		},
-	},
 
 	res: {
 		type: 'object',
@@ -107,6 +113,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					if (e.id === 'ec3f65c0-a9d1-47d9-8791-b2e7b9dcdced') throw new ApiError(meta.errors.alreadyFollowing);
 					if (e.id === '710e8fb0-b8c3-4922-be49-d5d93d8e6a6e') throw new ApiError(meta.errors.blocking);
 					if (e.id === '3338392a-f764-498d-8855-db939dcf8c48') throw new ApiError(meta.errors.blocked);
+					if (e.id === '9f9e4b7e-7d6b-4a13-9c2c-3d2f6b6c5f10') throw new ApiError(meta.errors.paidFollowRequired);
 				}
 				throw e;
 			}

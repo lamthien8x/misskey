@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { Brackets, IsNull } from 'typeorm';
+import { Brackets, IsNull, MoreThan } from 'typeorm';
 import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '@/models/User.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { QueueService } from '@/core/QueueService.js';
@@ -18,7 +18,7 @@ import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
 import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import { DI } from '@/di-symbols.js';
-import type { FollowingsRepository, FollowRequestsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, FollowRequestsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UsersRepository, PaidFollowsRepository } from '@/models/_.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { bindThis } from '@/decorators.js';
@@ -66,6 +66,9 @@ export class UserFollowingService implements OnModuleInit {
 
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
+
+		@Inject(DI.paidFollowsRepository)
+		private paidFollowsRepository: PaidFollowsRepository,
 
 		@Inject(DI.followRequestsRepository)
 		private followRequestsRepository: FollowRequestsRepository,
@@ -161,6 +164,25 @@ export class UserFollowingService implements OnModuleInit {
 		}
 
 		const followeeProfile = await this.userProfilesRepository.findOneByOrFail({ userId: followee.id });
+
+		// enforce paid follow if followee set a price (>0) and both are local users
+		if (
+			this.userEntityService.isLocalUser(follower) &&
+			this.userEntityService.isLocalUser(followee) &&
+			(followeeProfile.followPriceMonthly ?? 0) > 0
+		) {
+			const now = new Date();
+			const hasActive = await this.paidFollowsRepository.exists({
+				where: {
+					followerId: follower.id,
+					followeeId: followee.id,
+					expiresAt: MoreThan(now),
+				},
+			});
+			if (!hasActive) {
+				throw new IdentifiableError('9f9e4b7e-7d6b-4a13-9c2c-3d2f6b6c5f10', 'paid_follow_required');
+			}
+		}
 		// フォロー対象が鍵アカウントである or
 		// フォロワーがBotであり、フォロー対象がBotからのフォローに慎重である or
 		// フォロワーがローカルユーザーであり、フォロー対象がリモートユーザーである or

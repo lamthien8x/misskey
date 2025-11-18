@@ -35,6 +35,8 @@ import { FetchInstanceMetadataService } from './FetchInstanceMetadataService.js'
 import { GlobalEventService } from './GlobalEventService.js';
 import { HashtagService } from './HashtagService.js';
 import { HttpRequestService } from './HttpRequestService.js';
+import { SePayService } from './SePayService.js';
+import { SePayPgService } from './SePayPgService.js';
 import { IdService } from './IdService.js';
 import { ImageProcessingService } from './ImageProcessingService.js';
 import { SystemAccountService } from './SystemAccountService.js';
@@ -55,6 +57,7 @@ import { ReactionsBufferingService } from './ReactionsBufferingService.js';
 import { RelayService } from './RelayService.js';
 import { RoleService } from './RoleService.js';
 import { S3Service } from './S3Service.js';
+import { SePayCheckoutService } from './SePayCheckoutService.js';
 import { SignupService } from './SignupService.js';
 import { WebAuthnService } from './WebAuthnService.js';
 import { UserBlockingService } from './UserBlockingService.js';
@@ -200,6 +203,7 @@ const $ReactionsBufferingService: Provider = { provide: 'ReactionsBufferingServi
 const $RelayService: Provider = { provide: 'RelayService', useExisting: RelayService };
 const $RoleService: Provider = { provide: 'RoleService', useExisting: RoleService };
 const $S3Service: Provider = { provide: 'S3Service', useExisting: S3Service };
+const $SePayCheckoutService: Provider = { provide: 'SePayCheckoutService', useExisting: SePayCheckoutService };
 const $SignupService: Provider = { provide: 'SignupService', useExisting: SignupService };
 const $WebAuthnService: Provider = { provide: 'WebAuthnService', useExisting: WebAuthnService };
 const $UserBlockingService: Provider = { provide: 'UserBlockingService', useExisting: UserBlockingService };
@@ -305,6 +309,7 @@ const $ApMentionService: Provider = { provide: 'ApMentionService', useExisting: 
 const $ApNoteService: Provider = { provide: 'ApNoteService', useExisting: ApNoteService };
 const $ApPersonService: Provider = { provide: 'ApPersonService', useExisting: ApPersonService };
 const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting: ApQuestionService };
+const $SePayService: Provider = { provide: 'SePayService', useExisting: SePayService };
 //#endregion
 
 @Module({
@@ -334,6 +339,8 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		GlobalEventService,
 		HashtagService,
 		HttpRequestService,
+		SePayService,
+		SePayPgService,
 		IdService,
 		ImageProcessingService,
 		InternalStorageService,
@@ -354,6 +361,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		RelayService,
 		RoleService,
 		S3Service,
+		SePayCheckoutService,
 		SignupService,
 		WebAuthnService,
 		UserBlockingService,
@@ -504,6 +512,8 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		$RelayService,
 		$RoleService,
 		$S3Service,
+		$SePayCheckoutService,
+		{ provide: 'SePayPgService', useExisting: SePayPgService },
 		$SignupService,
 		$WebAuthnService,
 		$UserBlockingService,
@@ -609,9 +619,10 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		$ApNoteService,
 		$ApPersonService,
 		$ApQuestionService,
+		$SePayService,
 		//#endregion
 	],
-	exports: [
+		exports: [
 		QueueModule,
 		LoggerService,
 		AbuseReportService,
@@ -635,6 +646,9 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		GlobalEventService,
 		HashtagService,
 		HttpRequestService,
+		SePayService,
+		SePayPgService,
+		SePayCheckoutService,
 		IdService,
 		ImageProcessingService,
 		InternalStorageService,
@@ -784,6 +798,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		$GlobalEventService,
 		$HashtagService,
 		$HttpRequestService,
+		$SePayService,
 		$IdService,
 		$ImageProcessingService,
 		$InternalStorageService,
@@ -803,8 +818,9 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		$ReactionsBufferingService,
 		$RelayService,
 		$RoleService,
-		$S3Service,
-		$SignupService,
+        $S3Service,
+        $SePayCheckoutService,
+        $SignupService,
 		$WebAuthnService,
 		$UserBlockingService,
 		$CacheService,

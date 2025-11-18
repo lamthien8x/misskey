@@ -24,9 +24,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template v-else-if="!isFollowing && user.isLocked">
 			<span v-if="full" :class="$style.text">{{ i18n.ts.followRequest }}</span><i class="ti ti-plus"></i>
 		</template>
-		<template v-else-if="!isFollowing && !user.isLocked">
-			<span v-if="full" :class="$style.text">{{ i18n.ts.follow }}</span><i class="ti ti-plus"></i>
-		</template>
+        <template v-else-if="!isFollowing && !user.isLocked">
+            <span v-if="full" :class="$style.text">{{ followLabel }}</span><i class="ti ti-plus"></i>
+        </template>
 	</template>
 	<template v-else>
 		<span v-if="full" :class="$style.text">{{ i18n.ts.processing }}</span><MkLoading :em="true" :colored="false"/>
@@ -47,6 +47,7 @@ import { pleaseLogin } from '@/utility/please-login.js';
 import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
 import { haptic } from '@/utility/haptic.js';
+import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{
 	user: Misskey.entities.UserDetailed,
@@ -58,13 +59,25 @@ const props = withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{
-	(_: 'update:user', value: Misskey.entities.UserDetailed): void
+    (_: 'update:user', value: Misskey.entities.UserDetailed): void
 }>();
 
 const isFollowing = ref(props.user.isFollowing);
 const hasPendingFollowRequestFromYou = ref(props.user.hasPendingFollowRequestFromYou);
 const wait = ref(false);
 const connection = useStream().useChannel('main');
+
+const followPriceVnd = computed(() => {
+    const raw = (props.user as any)?.followPriceAmountVnd ?? (props.user as any)?.followPriceMonthly ?? 0;
+    const price = Number(raw);
+    return Number.isFinite(price) ? price : 0;
+});
+
+const followLabel = computed(() => {
+    return followPriceVnd.value > 0
+        ? `Follow — ${followPriceVnd.value.toLocaleString('vi-VN')}₫/30d`
+        : i18n.ts.follow;
+});
 
 if (props.user.isFollowing == null && $i) {
 	misskeyApi('users/show', {
@@ -87,8 +100,8 @@ async function onClick() {
 
 	haptic();
 
-	try {
-		if (isFollowing.value) {
+    try {
+        if (isFollowing.value) {
 			const { canceled } = await os.confirm({
 				type: 'warning',
 				text: i18n.tsx.unfollowConfirm({ name: props.user.name || props.user.username }),
@@ -115,26 +128,47 @@ async function onClick() {
 				}
 			}
 
-			if (hasPendingFollowRequestFromYou.value) {
-				await misskeyApi('following/requests/cancel', {
-					userId: props.user.id,
-				});
-				hasPendingFollowRequestFromYou.value = false;
-			} else {
-				await misskeyApi('following/create', {
-					userId: props.user.id,
-					withReplies: prefer.s.defaultFollowWithReplies,
-				});
-				emit('update:user', {
-					...props.user,
-					withReplies: prefer.s.defaultFollowWithReplies,
-				});
-				hasPendingFollowRequestFromYou.value = true;
+            if (hasPendingFollowRequestFromYou.value) {
+                await misskeyApi('following/requests/cancel', {
+                    userId: props.user.id,
+                });
+                hasPendingFollowRequestFromYou.value = false;
+            } else {
+                // If target requires paid follow, show SePay QR and allow input code after payment
+                if (followPriceVnd.value > 0) {
+                    try {
+                        const r = await misskeyApi('following/sepay-qr', { userId: props.user.id });
+                        const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkSepayQrDialog.vue').then(x => x.default), {
+                            user: props.user,
+                            qrDataUrl: r.qrUrl,
+                            amountVnd: r.amountVnd,
+                        }, {
+                            closed: () => dispose(),
+                        });
+                    } catch (err) {
+                        const code = (err as any)?.code ?? (err as any)?.response?.data?.error?.code;
+                        if (code === 'SEPAY_CONFIG_MISSING') {
+                            await os.alert({ type: 'warning', text: 'Chưa cấu hình SePay. Vui lòng liên hệ quản trị viên.' });
+                        } else if (code === 'PRICE_NOT_SET') {
+                            await os.alert({ type: 'warning', text: 'Tài khoản này chưa thiết lập giá theo dõi.' });
+                        }
+                    }
+                } else {
+                    await misskeyApi('following/create', {
+                        userId: props.user.id,
+                        withReplies: prefer.s.defaultFollowWithReplies,
+                    });
+                    emit('update:user', {
+                        ...props.user,
+                        withReplies: prefer.s.defaultFollowWithReplies,
+                    });
+                    hasPendingFollowRequestFromYou.value = true;
+                }
 
-				if ($i == null) {
-					wait.value = false;
-					return;
-				}
+                if ($i == null) {
+                    wait.value = false;
+                    return;
+                }
 
 				claimAchievement('following1');
 
@@ -150,13 +184,26 @@ async function onClick() {
 				if ($i.followingCount >= 300) {
 					claimAchievement('following300');
 				}
-			}
-		}
-	} catch (err) {
-		console.error(err);
-	} finally {
-		wait.value = false;
-	}
+            }
+        }
+} catch (err) {
+    const code = (err as any)?.code ?? (err as any)?.response?.data?.error?.code;
+    if (code === 'PAID_FOLLOW_REQUIRED' && followPriceVnd.value > 0) {
+        const r = await misskeyApi('following/sepay-qr', { userId: props.user.id });
+        const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkSepayQrDialog.vue').then(x => x.default), {
+            user: props.user,
+            qrDataUrl: r.qrUrl,
+            amountVnd: r.amountVnd,
+        }, {
+            closed: () => dispose(),
+        });
+        wait.value = false;
+        return;
+    }
+    console.error(err);
+    } finally {
+        wait.value = false;
+    }
 }
 
 onMounted(() => {

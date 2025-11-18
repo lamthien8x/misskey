@@ -195,8 +195,8 @@ export const packedUserLiteSchema = {
 } as const;
 
 export const packedUserDetailedNotMeOnlySchema = {
-	type: 'object',
-	properties: {
+    type: 'object',
+    properties: {
 		url: {
 			type: 'string',
 			format: 'url',
@@ -353,16 +353,24 @@ export const packedUserDetailedNotMeOnlySchema = {
 			nullable: false, optional: false,
 			enum: ['public', 'followers', 'private'],
 		},
-		followersVisibility: {
-			type: 'string',
-			nullable: false, optional: false,
-			enum: ['public', 'followers', 'private'],
-		},
-		chatScope: {
-			type: 'string',
-			nullable: false, optional: false,
-			enum: ['everyone', 'following', 'followers', 'mutual', 'none'],
-		},
+        followersVisibility: {
+            type: 'string',
+            nullable: false, optional: false,
+            enum: ['public', 'followers', 'private'],
+        },
+        followPriceMonthly: {
+            type: 'number',
+            nullable: false, optional: true,
+        },
+        followPriceAmountVnd: {
+            type: 'number',
+            nullable: false, optional: true,
+        },
+        chatScope: {
+            type: 'string',
+            nullable: false, optional: false,
+            enum: ['everyone', 'following', 'followers', 'mutual', 'none'],
+        },
 		canChat: {
 			type: 'boolean',
 			nullable: false, optional: false,

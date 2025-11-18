@@ -59,6 +59,7 @@ import {
 	miRepository,
 	MiRetentionAggregation,
 	MiReversiGame,
+	MiPaidFollow,
 	MiRole,
 	MiRoleAssignment,
 	MiSignin,
@@ -539,9 +540,15 @@ const $bubbleGameRecordsRepository: Provider = {
 };
 
 const $reversiGamesRepository: Provider = {
-	provide: DI.reversiGamesRepository,
-	useFactory: (db: DataSource) => db.getRepository(MiReversiGame).extend(miRepository as MiRepository<MiReversiGame>),
-	inject: [DI.db],
+  provide: DI.reversiGamesRepository,
+  useFactory: (db: DataSource) => db.getRepository(MiReversiGame).extend(miRepository as MiRepository<MiReversiGame>),
+  inject: [DI.db],
+};
+
+const $paidFollowsRepository: Provider = {
+  provide: DI.paidFollowsRepository,
+  useFactory: (db: DataSource) => db.getRepository(MiPaidFollow).extend(miRepository as MiRepository<MiPaidFollow>),
+  inject: [DI.db],
 };
 
 @Module({
@@ -623,6 +630,7 @@ const $reversiGamesRepository: Provider = {
 		$chatApprovalsRepository,
 		$bubbleGameRecordsRepository,
 		$reversiGamesRepository,
+		$paidFollowsRepository,
 	],
 	exports: [
 		$usersRepository,
@@ -701,6 +709,7 @@ const $reversiGamesRepository: Provider = {
 		$chatApprovalsRepository,
 		$bubbleGameRecordsRepository,
 		$reversiGamesRepository,
+		$paidFollowsRepository,
 	],
 })
 export class RepositoryModule {

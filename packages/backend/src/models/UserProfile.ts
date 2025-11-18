@@ -209,6 +209,13 @@ export class MiUserProfile {
 	})
 	public receiveAnnouncementEmail: boolean;
 
+	// Giá theo dõi cho 30 ngày (đơn vị integer, mặc định 0 = miễn phí)
+	@Column('integer', {
+		default: 0,
+		comment: 'Follow price for 30 days set by the user.',
+	})
+	public followPriceMonthly: number;
+
 	@Column({
 		...id(),
 		nullable: true,

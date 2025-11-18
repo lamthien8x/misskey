@@ -51,6 +51,7 @@ import { FeedService } from './FeedService.js';
 import { UrlPreviewService } from './UrlPreviewService.js';
 import { ClientLoggerService } from './ClientLoggerService.js';
 import type { FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify';
+import { SePayCheckoutService } from '@/core/SePayCheckoutService.js';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -117,7 +118,8 @@ export class ClientServerService {
 		private urlPreviewService: UrlPreviewService,
 		private feedService: FeedService,
 		private roleService: RoleService,
-		private clientLoggerService: ClientLoggerService,
+	private clientLoggerService: ClientLoggerService,
+	private sepayCheckoutService: SePayCheckoutService,
 	) {
 		//this.createServer = this.createServer.bind(this);
 	}
@@ -300,6 +302,39 @@ export class ClientServerService {
 
 		fastify.get('/apple-touch-icon.png', async (request, reply) => {
 			return reply.sendFile('/apple-touch-icon.png', staticAssets);
+		});
+
+
+		// SePay Checkout auto-submit page
+		fastify.get('/sepay/checkout', async (request, reply) => {
+			try {
+				const ticket = String((request.query as any)?.ticket ?? '');
+				if (!ticket) {
+					reply.code(400);
+					return reply.send('Missing ticket');
+				}
+				const key = `${this.config.redis.prefix}:sepay:ticket:${ticket}`;
+				const s = await this.redis.get(key);
+				if (!s) {
+					reply.code(404);
+					return reply.send('Ticket expired');
+				}
+				const parsed = JSON.parse(s);
+				const fields = parsed.fields as Record<string, string>;
+				const actionUrl = String(parsed.checkoutUrl ?? '');
+				let html = '<!doctype html><html><head><meta charset="utf-8"><title>SePay Checkout</title></head><body>';
+				html += `<form method="POST" action="${actionUrl.replace(/"/g,'&quot;')}">`;
+				for (const [name, value] of Object.entries(fields)) {
+					html += `<input type="hidden" name="${name}" value="${String(value).replace(/"/g,'&quot;')}">`;
+				}
+				html += '<noscript><button type="submit">Proceed to Payment</button></noscript>';
+				html += '</form><script>document.forms[0].submit();</script></body></html>';
+				reply.header('Content-Type', 'text/html; charset=utf-8');
+				return reply.send(html);
+			} catch (e) {
+				reply.code(500);
+				return reply.send('Unexpected error');
+			}
 		});
 
 		fastify.get<{ Params: { path: string } }>('/fluent-emoji/:path(.*)', async (request, reply) => {
