@@ -1061,7 +1061,7 @@ collapseRenotesDescription: "Các bài đăng bị thu gọn mà bạn đã ph�
 internalServerError: "Lỗi trong chủ máy"
 internalServerErrorDescription: "Trong chủ máy lỗi bất ngờ xảy ra"
 copyErrorInfo: "Sao chép thông tin lỗi"
-joinThisServer: "Đăng ký trên chủ máy này"
+joinThisServer: "Đăng ký"
 exploreOtherServers: "Tìm chủ máy khác"
 letsLookAtTimeline: "Thử xem Timeline"
 disableFederationConfirm: "Bạn có muốn làm điều đó mà không cần liên minh không?"
