@@ -83,7 +83,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
       if (!token) throw new ApiError(meta.errors.tokenNotFound);
 
       const mappingStr = await this.redis.get(`${this.config.redis.prefix}:sepay:token:${token}`);
-      const mapping = mappingStr ? JSON.parse(mappingStr) : null;
+      let mapping = mappingStr ? JSON.parse(mappingStr) : null;
+      if (!mapping && /^PF(?!_)/.test(token)) {
+        const alt = token.replace(/^PF(?!_)/, 'PF_');
+        const altStr = await this.redis.get(`${this.config.redis.prefix}:sepay:token:${alt}`);
+        mapping = altStr ? JSON.parse(altStr) : null;
+      }
       if (!mapping) throw new ApiError(meta.errors.tokenNotFound);
 
       const follower = await this.getterService.getUser(mapping.followerId).catch(err => {
