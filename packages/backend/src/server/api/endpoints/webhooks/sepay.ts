@@ -78,7 +78,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 
       const content: string = (body?.content ?? body?.description ?? '') as string;
       const transferAmount: number = Number(body?.transferAmount ?? 0);
-      const tokenMatch = content?.match(/PF_[A-Za-z0-9]+/);
+      const tokenMatch = content?.match(/PF_?[A-Za-z0-9]+/);
       const token = tokenMatch?.[0];
       if (!token) throw new ApiError(meta.errors.tokenNotFound);
 
