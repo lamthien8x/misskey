@@ -65,8 +65,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const des = encodeURIComponent(`${token}`);
 			const qrUrl = `${sepay.qrBase}?acc=${encodeURIComponent(sepay.qrAccount)}&bank=${encodeURIComponent(sepay.qrBank)}&amount=${amount}&des=${des}`;
 
-			await this.redis.setex(`${this.config.redis.prefix}:sepay:token:${token}`, 60 * 60, JSON.stringify({ followerId: me.id, followeeId: followee.id, amount }));
-			return { qrUrl, token, amountVnd: amount };
-		});
-	}
+      await this.redis.setex(`sepay:token:${token}`, 60 * 60, JSON.stringify({ followerId: me.id, followeeId: followee.id, amount }));
+      return { qrUrl, token, amountVnd: amount };
+    });
+  }
 }

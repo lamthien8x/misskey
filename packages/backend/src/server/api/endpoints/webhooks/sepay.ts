@@ -11,7 +11,7 @@ import { UserFollowingService } from '@/core/UserFollowingService.js';
 import { SePayService } from '@/core/SePayService.js';
 import * as Redis from 'ioredis';
 import type { Config } from '@/config.js';
-import { MoreThan } from 'typeorm';
+import { MoreThan, IsNull } from 'typeorm';
 
 export const meta = {
   tags: ['webhooks','following','users'],
@@ -40,7 +40,22 @@ export const meta = {
   },
 } as const;
 
-export const paramDef = { type: 'object', properties: {} } as const;
+export const paramDef = {
+  type: 'object',
+  properties: {
+    content: { type: 'string', nullable: true },
+    description: { type: 'string', nullable: true },
+    transaction_content: { type: 'string', nullable: true },
+    transactionContent: { type: 'string', nullable: true },
+    body: { type: 'string', nullable: true },
+    message: { type: 'string', nullable: true },
+    transferAmount: { type: 'integer', nullable: true },
+    amount_in: { type: 'integer', nullable: true },
+    amountIn: { type: 'integer', nullable: true },
+    amount: { type: 'integer', nullable: true },
+  },
+  additionalProperties: true,
+} as const;
 
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> {
@@ -64,30 +79,69 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
     private sepayService: SePayService,
     @Inject(DI.redis) private redis: Redis.Redis,
   ) {
-    super(meta, paramDef, async (_ps, _user, _token, _file, _cleanup, _ip, headers, body) => {
+    super(meta, paramDef, async (ps, _user, _token, _file, _cleanup, _ip, headers) => {
       // Optional API key auth (depends on SePay webhook config)
       const apiKey = this.config.sepay?.apiKey;
       const hAuth = (headers?.authorization ?? headers?.Authorization ?? '') as string;
       const hXApiKey = (headers?.['x-api-key'] ?? headers?.['X-Api-Key'] ?? headers?.['x-sepay-api-key'] ?? headers?.['X-Sepay-Api-Key'] ?? '') as string;
-      const bodyApiKey = (body?.apiKey ?? body?.api_key ?? '') as string;
+      const bodyApiKey = ((ps as any)?.apiKey ?? (ps as any)?.api_key ?? '') as string;
       if (apiKey) {
         const normalized = hAuth.toString().replace(/^Bearer\s+/i, '').trim();
         const presented = (normalized || hXApiKey || bodyApiKey).toString().trim();
         if (presented !== apiKey) throw new ApiError(meta.errors.unauthorized);
       }
 
-      const content: string = (body?.content ?? body?.description ?? '') as string;
-      const transferAmount: number = Number(body?.transferAmount ?? 0);
-      const tokenMatch = content?.match(/PF_?[A-Za-z0-9]+/);
-      const token = tokenMatch?.[0];
+      const ct = String((headers?.['content-type'] ?? headers?.['Content-Type'] ?? ''));
+      const payload: any = ps as any;
+      const contentCandidate = (payload?.content ?? payload?.description ?? payload?.transaction_content ?? payload?.transactionContent ?? payload?.message ?? payload?.body ?? '') as string;
+      let transferAmount: number = Number(payload?.transferAmount ?? payload?.amount_in ?? payload?.amountIn ?? payload?.amount ?? 0);
+      console.log('[webhooks/sepay] content-type:', ct);
+      console.log('[webhooks/sepay] content:', typeof contentCandidate === 'string' ? contentCandidate.slice(0, 200) : contentCandidate);
+      console.log('[webhooks/sepay] transferAmount:', transferAmount);
+      let token: string | undefined = contentCandidate?.match(/PF_?[A-Za-z0-9]+/)?.[0];
+      if (!token && typeof payload === 'object' && payload) {
+        for (const v of Object.values(payload)) {
+          if (typeof v === 'string') { const m = v.match(/PF_?[A-Za-z0-9]+/); if (m) { token = m[0]; break; } }
+        }
+      }
+      console.log('[webhooks/sepay] token extracted:', token);
       if (!token) throw new ApiError(meta.errors.tokenNotFound);
 
-      const mappingStr = await this.redis.get(`${this.config.redis.prefix}:sepay:token:${token}`);
+      const mappingStr = await this.redis.get(`sepay:token:${token}`);
+      console.log('[webhooks/sepay] redis get token key exists:', !!mappingStr);
       let mapping = mappingStr ? JSON.parse(mappingStr) : null;
       if (!mapping && /^PF(?!_)/.test(token)) {
         const alt = token.replace(/^PF(?!_)/, 'PF_');
-        const altStr = await this.redis.get(`${this.config.redis.prefix}:sepay:token:${alt}`);
+        const altStr = await this.redis.get(`sepay:token:${alt}`);
+        console.log('[webhooks/sepay] redis get alt token key exists:', !!altStr);
         mapping = altStr ? JSON.parse(altStr) : null;
+      }
+      if (!mapping) {
+        const keys = await this.redis.keys(`sepay:token:*`);
+        console.log('[webhooks/sepay] redis keys count:', keys.length);
+        for (const k of keys) {
+          const v = await this.redis.get(k);
+          if (!v) continue;
+          const m = JSON.parse(v);
+          if (Number(m.amount) === Number(transferAmount)) { mapping = m; break; }
+        }
+        console.log('[webhooks/sepay] mapping after amount fallback exists:', !!mapping);
+      }
+      if (!mapping) {
+        const followerUsername = (payload?.followerUsername ?? payload?.follower ?? '') as string;
+        const followeeUsername = (payload?.followeeUsername ?? payload?.followee ?? '') as string;
+        const followerId = (payload?.followerId ?? '') as string;
+        const followeeId = (payload?.followeeId ?? '') as string;
+        let follower = null;
+        let followee = null;
+        if (followerId) follower = await this.getterService.getUser(followerId).catch(() => null);
+        if (followeeId) followee = await this.getterService.getUser(followeeId).catch(() => null);
+        if (!follower && followerUsername) follower = await this.usersRepository.findOneBy({ usernameLower: followerUsername.toLowerCase(), host: IsNull(), isSuspended: false }).catch(() => null);
+        if (!followee && followeeUsername) followee = await this.usersRepository.findOneBy({ usernameLower: followeeUsername.toLowerCase(), host: IsNull(), isSuspended: false }).catch(() => null);
+        if (follower && followee) {
+          mapping = { followerId: follower.id, followeeId: followee.id, amount: transferAmount } as any;
+          console.log('[webhooks/sepay] manual mapping via usernames/ids applied');
+        }
       }
       if (!mapping) throw new ApiError(meta.errors.tokenNotFound);
 
@@ -126,7 +180,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
       }
 
       await this.userFollowingService.follow(follower, followee);
-      await this.redis.del(`${this.config.redis.prefix}:sepay:token:${token}`);
+      await this.redis.del(`sepay:token:${token}`);
       return { ok: true };
     });
   }
