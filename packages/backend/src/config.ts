@@ -65,11 +65,18 @@ type Source = {
 		scope?: 'local' | 'global' | string[];
 	};
 
-	sepay?: {
-		baseUrl: string;
-		apiKey: string;
-		verifyEndpoint?: string;
-	};
+    sepay?: {
+        env?: string;
+        merchantId?: string;
+        secretKey?: string;
+        qrAccount?: string;
+        qrBank?: string;
+        qrBase?: string;
+        baseUrl?: string;
+        apiKey?: string;
+        verifyEndpoint?: string;
+        checkoutBaseUrl?: string;
+    };
 	sentryForBackend?: { options: Partial<Sentry.NodeOptions>; enableNodeProfiling: boolean; };
 	sentryForFrontend?: {
 		options: Partial<SentryVue.BrowserOptions> & { dsn: string };
@@ -157,11 +164,18 @@ export type Config = {
 		index: string;
 		scope?: 'local' | 'global' | string[];
 	} | undefined;
-	sepay?: {
-		baseUrl: string;
-		apiKey: string;
-		verifyEndpoint?: string;
-	};
+    sepay?: {
+        env: string;
+        merchantId?: string;
+        secretKey?: string;
+        qrAccount?: string;
+        qrBank?: string;
+        qrBase?: string;
+        baseUrl?: string;
+        apiKey?: string;
+        verifyEndpoint?: string;
+        checkoutBaseUrl?: string;
+    };
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
 	proxyBypassHosts: string[] | undefined;
@@ -242,7 +256,28 @@ export const path = process.env.MISSKEY_CONFIG_YML
 		? resolve(dir, 'test.yml')
 		: resolve(dir, 'default.yml');
 
+function loadEnvFromFile(filePath: string) {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    for (const line of raw.split(/\r?\n/)) {
+      const s = line.trim();
+      if (!s || s.startsWith('#')) continue;
+      const eq = s.indexOf('=');
+      if (eq <= 0) continue;
+      const key = s.slice(0, eq).trim();
+      let value = s.slice(eq + 1).trim();
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith('\'') && value.endsWith('\''))) {
+        value = value.slice(1, -1);
+      }
+      if (!(key in process.env)) process.env[key] = value;
+    }
+  } catch {}
+}
+
 export function loadConfig(): Config {
+  const _backendRoot = resolve(_dirname, '..');
+  loadEnvFromFile(resolve(_backendRoot, '.env'));
+
 	const meta = JSON.parse(fs.readFileSync(`${_dirname}/../../../built/meta.json`, 'utf-8'));
 
 	const frontendManifestExists = fs.existsSync(_dirname + '/../../../built/_frontend_vite_/manifest.json');
@@ -255,6 +290,26 @@ export function loadConfig(): Config {
 		: { 'src/boot.ts': { file: null } };
 
 	const config = yaml.load(fs.readFileSync(path, 'utf-8')) as Source;
+
+  const sepayYaml = config.sepay ?? {};
+  const before = JSON.stringify(sepayYaml);
+  const afterObj = {
+    ...sepayYaml,
+    env: process.env.SEPAY_ENV ?? sepayYaml.env,
+    merchantId: process.env.SEPAY_MERCHANT_ID ?? sepayYaml.merchantId,
+    secretKey: process.env.SEPAY_SECRET_KEY ?? sepayYaml.secretKey,
+    qrAccount: process.env.SEPAY_QR_ACCOUNT ?? sepayYaml.qrAccount,
+    qrBank: process.env.SEPAY_QR_BANK ?? sepayYaml.qrBank,
+    qrBase: process.env.SEPAY_QR_BASE ?? sepayYaml.qrBase,
+    apiKey: process.env.SEPAY_API_KEY ?? sepayYaml.apiKey,
+  } as NonNullable<Source['sepay']>;
+  config.sepay = afterObj;
+  const after = JSON.stringify(config.sepay);
+  if (before !== after) {
+    try {
+      fs.writeFileSync(path, yaml.dump(config), 'utf-8');
+    } catch {}
+  }
 
 	const url = tryCreateUrl(config.url ?? process.env.MISSKEY_URL ?? '');
 	const version = meta.version;
@@ -295,17 +350,21 @@ export function loadConfig(): Config {
 		dbReplications: config.dbReplications,
 		dbSlaves: config.dbSlaves,
 		fulltextSearch: config.fulltextSearch,
-		meilisearch: config.meilisearch,
-		sepay: (() => {
-			const env = process.env.SEPAY_ENV ?? 'sandbox';
-			const merchantId = process.env.SEPAY_MERCHANT_ID;
-			const secretKey = process.env.SEPAY_SECRET_KEY;
-			const qrAccount = process.env.SEPAY_QR_ACCOUNT;
-			const qrBank = process.env.SEPAY_QR_BANK;
-			const qrBase = process.env.SEPAY_QR_BASE ?? 'https://qr.sepay.vn/img';
-			if (!merchantId || !secretKey) return undefined;
-			return { env, merchantId, secretKey, qrAccount, qrBank, qrBase };
-		})(),
+        meilisearch: config.meilisearch,
+        sepay: (() => {
+            const sepayConf = config.sepay ?? {};
+            const env = process.env.SEPAY_ENV ?? sepayConf.env ?? 'sandbox';
+            const merchantId = process.env.SEPAY_MERCHANT_ID ?? sepayConf.merchantId;
+            const secretKey = process.env.SEPAY_SECRET_KEY ?? sepayConf.secretKey;
+            const qrAccount = process.env.SEPAY_QR_ACCOUNT ?? sepayConf.qrAccount;
+            const qrBank = process.env.SEPAY_QR_BANK ?? sepayConf.qrBank;
+            const qrBase = process.env.SEPAY_QR_BASE ?? sepayConf.qrBase ?? 'https://qr.sepay.vn/img';
+            const baseUrl = sepayConf.baseUrl;
+            const apiKey = process.env.SEPAY_API_KEY ?? sepayConf.apiKey;
+            const verifyEndpoint = sepayConf.verifyEndpoint;
+            const checkoutBaseUrl = sepayConf.checkoutBaseUrl;
+            return { env, merchantId, secretKey, qrAccount, qrBank, qrBase, baseUrl, apiKey, verifyEndpoint, checkoutBaseUrl };
+        })(),
 		redis,
 		redisForPubsub: config.redisForPubsub ? convertRedisOptions(config.redisForPubsub, host) : redis,
 		redisForJobQueue: config.redisForJobQueue ? convertRedisOptions(config.redisForJobQueue, host) : redis,

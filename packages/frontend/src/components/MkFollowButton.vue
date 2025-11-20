@@ -149,6 +149,8 @@ async function onClick() {
                         const code = (err as any)?.code ?? (err as any)?.response?.data?.error?.code;
                         if (code === 'SEPAY_CONFIG_MISSING') {
                             await os.alert({ type: 'warning', text: 'Chưa cấu hình SePay. Vui lòng liên hệ quản trị viên.' });
+                        } else if (code === 'SEPAY_QR_CONFIG_MISSING') {
+                            await os.alert({ type: 'warning', text: 'Thiếu cấu hình tài khoản/bank cho QR SePay. Vui lòng liên hệ quản trị viên.' });
                         } else if (code === 'PRICE_NOT_SET') {
                             await os.alert({ type: 'warning', text: 'Tài khoản này chưa thiết lập giá theo dõi.' });
                         }
