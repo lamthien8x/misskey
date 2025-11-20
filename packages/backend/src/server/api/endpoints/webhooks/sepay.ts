@@ -67,8 +67,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
     super(meta, paramDef, async (_ps, _user, _token, _file, _cleanup, _ip, headers, body) => {
       // Optional API key auth (depends on SePay webhook config)
       const apiKey = this.config.sepay?.apiKey;
-      const auth = headers?.authorization ?? headers?.Authorization ?? '';
-      if (apiKey && auth !== `Bearer ${apiKey}`) throw new ApiError(meta.errors.unauthorized);
+      const hAuth = (headers?.authorization ?? headers?.Authorization ?? '') as string;
+      const hXApiKey = (headers?.['x-api-key'] ?? headers?.['X-Api-Key'] ?? headers?.['x-sepay-api-key'] ?? headers?.['X-Sepay-Api-Key'] ?? '') as string;
+      const bodyApiKey = (body?.apiKey ?? body?.api_key ?? '') as string;
+      if (apiKey) {
+        const normalized = hAuth.toString().replace(/^Bearer\s+/i, '').trim();
+        const presented = (normalized || hXApiKey || bodyApiKey).toString().trim();
+        if (presented !== apiKey) throw new ApiError(meta.errors.unauthorized);
+      }
 
       const content: string = (body?.content ?? body?.description ?? '') as string;
       const transferAmount: number = Number(body?.transferAmount ?? 0);
