@@ -72,6 +72,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<i class="ti ti-gift"></i>
 						<span>Quà báo đáp: {{ getRewardLabel(pkg.rewardType) }}</span>
 					</div>
+					<div v-else-if="pkg.rewardType === 'none'" :class="$style.cardReward">
+						<i class="ti ti-gift"></i>
+						<span>Cho đi không mong nhận lại gì</span>
+					</div>
 
 					<!-- Progress -->
 					<div :class="$style.cardProgress">
@@ -89,7 +93,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 					<!-- Action button -->
 					<div :class="$style.cardAction">
-						<span class="_buttonPrimary" style="width: 100%; text-align: center; display: block; padding: 8px;">
+						<span class="_buttonPrimary" style="box-sizing: border-box; width: 100%; display: flex; justify-content: center; align-items: center; padding: 8px; border-radius: 99px;">
 							Giúp đỡ ngay
 						</span>
 					</div>
@@ -177,10 +181,8 @@ function truncateText(text: string, maxLength: number): string {
 
 function getRewardLabel(rewardType: string): string {
 	switch (rewardType) {
-		case 'none': return 'Không có';
-		case 'digital': return 'Quà kỹ thuật số';
-		case 'physical': return 'Quà vật lý';
-		case 'service': return 'Dịch vụ';
+		case 'online': return 'Ảnh và video';
+		case 'direct': return 'Gặp mặt';
 		default: return rewardType;
 	}
 }
