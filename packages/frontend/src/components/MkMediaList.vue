@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		>
 			<template v-for="media in mediaList.filter(media => previewable(media))">
 				<XVideo v-if="media.type.startsWith('video')" :key="`video:${media.id}`" :class="$style.media" :video="media"/>
-				<XImage v-else-if="media.type.startsWith('image')" :key="`image:${media.id}`" :class="$style.media" class="image" :data-id="media.id" :image="media" :raw="raw"/>
+				<XImage v-else-if="media.type.startsWith('image')" :key="`image:${media.id}`" :class="$style.media" class="image" :data-id="media.id" :image="media" :raw="raw || count === 1"/>
 			</template>
 		</div>
 	</div>
@@ -235,19 +235,15 @@ defineExpose({
 	display: grid;
 	grid-gap: 8px;
 
-	height: 100%;
+	height: auto;
 	width: 100%;
+	align-items: center;
 
 	&.n1 {
 		grid-template-rows: 1fr;
 
 		// default but fallback (expand)
 		min-height: 64px;
-		max-height: clamp(
-			64px,
-			50cqh,
-			min(360px, 50vh)
-		);
 
 		&.n116_9 {
 			min-height: initial;
@@ -269,15 +265,12 @@ defineExpose({
 	}
 
 	&.n2 {
-		aspect-ratio: 16/9;
 		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 1fr;
 	}
 
 	&.n3 {
-		aspect-ratio: 16/9;
 		grid-template-columns: 1fr 0.5fr;
-		grid-template-rows: 1fr 1fr;
+		grid-template-rows: auto auto;
 
 		> .media:nth-child(1) {
 			grid-row: 1 / 3;
@@ -290,17 +283,12 @@ defineExpose({
 	}
 
 	&.n4 {
-		aspect-ratio: 16/9;
 		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 1fr 1fr;
+		grid-template-rows: auto auto;
 	}
 
 	&.nMany {
 		grid-template-columns: 1fr 1fr;
-
-		> .media {
-			aspect-ratio: 16/9;
-		}
 	}
 }
 
