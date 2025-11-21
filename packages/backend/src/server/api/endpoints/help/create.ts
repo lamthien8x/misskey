@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, UserProfilesRepository } from '@/models/_.js';
+import type { UsersRepository, UserProfilesRepository, RoleAssignmentsRepository } from '@/models/_.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { IdService } from '@/core/IdService.js';
@@ -45,6 +45,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		@Inject(DI.config) private config: Config,
 		@Inject(DI.usersRepository) private usersRepository: UsersRepository,
 		@Inject(DI.userProfilesRepository) private userProfilesRepository: UserProfilesRepository,
+		@Inject(DI.roleAssignmentsRepository) private roleAssignmentsRepository: RoleAssignmentsRepository,
 		private getterService: GetterService,
 		private userEntityService: UserEntityService,
 		private idService: IdService,
@@ -54,6 +55,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			if (!this.userEntityService.isLocalUser(me)) throw new ApiError(meta.errors.notEligible);
 			// Eligibility relaxed: only require login (handled by requireCredential)
+
+			// Check if user has at least one role
+			const roleCount = await this.roleAssignmentsRepository.count({
+				where: { userId: me.id },
+			});
+			if (roleCount === 0) {
+				throw new ApiError(meta.errors.notEligible);
+			}
 
 			const serverMeta = await this.metaService.fetch();
 			if (serverMeta.maxHelpPackagesPerUser > 0) {
