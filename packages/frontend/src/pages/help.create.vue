@@ -72,15 +72,6 @@ async function pickFiles() {
 }
 
 async function submit() {
-	if (!$i || !$i.roles || $i.roles.length === 0) {
-		await os.alert({
-			type: 'warning',
-			title: 'Chưa được cấp quyền',
-			text: '<center>**Bạn cần được cấp quyền để sử dụng tính năng này**</center>\n\nVui lòng liên hệ admin để mở khóa:\n\n<center>**Zalo: 0387684547**</center>\n<center>(gặp admin Hồ Công)</center>',
-		});
-		return;
-	}
-
 	try {
 		const r = await misskeyApi('help/create', { amountVnd: amountVnd.value, rewardType: rewardType.value, rewardMediaFileIds: rewardMediaFileIds.value, content: content.value });
 		await os.alert({ type: 'success', text: `Đã tạo gói: ${r.id}` });
