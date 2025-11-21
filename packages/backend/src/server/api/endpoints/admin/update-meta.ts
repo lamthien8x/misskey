@@ -210,6 +210,7 @@ export const paramDef = {
 		remoteNotesCleaningExpiryDaysForEachNotes: { type: 'number' },
 		remoteNotesCleaningMaxProcessingDurationInMinutes: { type: 'number' },
 		showRoleBadgesOfRemoteUsers: { type: 'boolean' },
+		maxHelpPackagesPerUser: { type: 'integer', minimum: 0 },
 	},
 	required: [],
 } as const;
@@ -746,6 +747,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.showRoleBadgesOfRemoteUsers !== undefined) {
 				set.showRoleBadgesOfRemoteUsers = ps.showRoleBadgesOfRemoteUsers;
+			}
+
+			if (ps.maxHelpPackagesPerUser !== undefined) {
+				set.maxHelpPackagesPerUser = ps.maxHelpPackagesPerUser;
 			}
 
 			const before = await this.metaService.fetch(true);

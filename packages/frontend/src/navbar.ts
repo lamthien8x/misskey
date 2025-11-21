@@ -42,6 +42,18 @@ export const navbarItemDef = reactive({
 		icon: 'ti ti-user-plus',
 		show: computed(() => false), // hidden per request		to: '/my/follow-requests',
 	},
+	help: {
+		title: 'Gói giúp đỡ',
+		icon: 'ti ti-heart-handshake',
+		show: computed(() => true),
+		to: '/help',
+	},
+	helpMy: {
+		title: 'Hỗ trợ của tôi',
+		icon: 'ti ti-handshake',
+		show: computed(() => $i != null),
+		to: '/help/my',
+	},
 	explore: {
 		title: i18n.ts.explore,
 		icon: 'ti ti-hash',
@@ -113,6 +125,12 @@ export const navbarItemDef = reactive({
 		title: i18n.ts.channel,
 		icon: 'ti ti-device-tv',
 		to: '/channels',
+	},
+	helpAdmin: {
+		title: 'Quản trị gói giúp đỡ',
+		icon: 'ti ti-shield-heart',
+		show: computed(() => $i != null && $i.isAdmin),
+		to: '/admin/help',
 	},
 	chat: {
 		title: i18n.ts.directMessage_short,
@@ -188,3 +206,10 @@ export const navbarItemDef = reactive({
 		},
 	},
 });
+
+export const extraNavbarItemHelp = {
+  title: 'Gói giúp đỡ',
+  icon: 'ti ti-heart-handshake',
+  show: computed(() => $i != null),
+  to: '/help',
+} as const;

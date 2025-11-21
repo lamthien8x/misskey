@@ -1,0 +1,9 @@
+
+> frontend@ typecheck /Users/Apple/Documents/GitHub/misskey/packages/frontend
+> vue-tsc --noEmit
+
+src/pages/help.create.vue(12,20): error TS2353: Object literal may only specify known properties, and 'modelModifiers' does not exist in type '{ modelValue: number | null; type?: "number" | undefined; required?: boolean | undefined; readonly?: boolean | undefined; disabled?: boolean | undefined; pattern?: string | undefined; ... 19 more ...; "onUpdate:modelValue"?: ((value: number) => any) | undefined; } & VNodeProps & AllowedComponentProps & ComponentCust...'.
+src/pages/help.explore.vue(75,14): error TS2345: Argument of type '`/help/${string}`' is not assignable to parameter of type '"/" | "/:(*)" | "/settings/profiles" | "/settings/accounts" | "/help" | "/help/create" | "/help/my" | "/help/:id" | "/timeline" | "/@:username/pages/:pageName(*)" | "/@:acct/following" | ... 145 more ... | "/admin/system-webhook"'.
+src/pages/timeline.vue(152,6): error TS2322: Type '({ id: string; name: string | null; username: string; host: string | null; avatarUrl: string; avatarBlurhash: string | null; avatarDecorations: { id: string; angle?: number | undefined; flipH?: boolean | undefined; url: string; offsetX?: number | undefined; offsetY?: number | undefined; }[]; ... 8 more ...; badgeRol...' is not assignable to type 'never'.
+  Type '{ id: string; name: string | null; username: string; host: string | null; avatarUrl: string; avatarBlurhash: string | null; avatarDecorations: { id: string; angle?: number | undefined; flipH?: boolean | undefined; url: string; offsetX?: number | undefined; offsetY?: number | undefined; }[]; ... 8 more ...; badgeRole...' is not assignable to type 'never'.
+ ELIFECYCLE  Command failed with exit code 2.

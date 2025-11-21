@@ -726,6 +726,11 @@ export class MiMeta {
 		default: { },
 	})
 	public clientOptions: Record<string, any>;
+
+	@Column('integer', {
+		default: 0,
+	})
+	public maxHelpPackagesPerUser: number;
 }
 
 export type SoftwareSuspension = {

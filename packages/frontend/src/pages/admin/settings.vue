@@ -453,6 +453,15 @@ const adForm = useForm({
 	fetchInstance(true);
 });
 
+const helpForm = useForm({
+	maxHelpPackagesPerUser: (meta as any).maxHelpPackagesPerUser ?? 0,
+}, async (state) => {
+	await os.apiWithDialog('admin/update-meta', {
+		maxHelpPackagesPerUser: state.maxHelpPackagesPerUser,
+	} as any);
+	fetchInstance(true);
+});
+
 const urlPreviewForm = useForm({
 	urlPreviewEnabled: meta.urlPreviewEnabled,
 	urlPreviewAllowRedirect: meta.urlPreviewAllowRedirect,

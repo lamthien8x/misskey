@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div :class="$style.content">
 			<div :class="$style.card">
 				<template v-if="!paid">
-					<div :class="$style.amount"><i class="ti ti-currency-dong" style="margin-right:6px;"></i>{{ i18n.ts.follow }} — {{ amountVnd.toLocaleString('vi-VN') }}₫/30d</div>
+					<div :class="$style.amount"><i class="ti ti-currency-dong" style="margin-right:6px;"></i>{{ headerLabel }} — {{ amountVnd.toLocaleString('vi-VN') }}₫</div>
 					<div :class="$style.timerWrap">
 						<div :class="$style.timerCircle" :style="{ '--pct': pct + '%' }">
 							<div :class="$style.timerText"><i class="ti ti-clock" style="margin-right:6px;"></i>{{ mm }}:{{ ss }}</div>
@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</template>
 				<template v-else>
 					<div :class="$style.successIcon"><i class="ti ti-circle-check"></i></div>
-					<div :class="$style.paid">Bạn đã thanh toán thành công, bạn đã trở thành người theo dõi trong 30 ngày</div>
+					<div :class="$style.paid">{{ isHelp ? 'Bạn đã thanh toán thành công cho gói giúp đỡ' : 'Bạn đã thanh toán thành công, bạn đã trở thành người theo dõi trong 30 ngày' }}</div>
 					<div :class="$style.autoCloseHint"><i class="ti ti-confetti" style="margin-right:6px;"></i>Cửa sổ sẽ tự đóng sau 3 giây</div>
 				</template>
 			</div>
@@ -52,10 +52,11 @@ import { i18n } from '@/i18n.js';
 const modal = useTemplateRef('modal');
 
 const props = defineProps<{
-	user: Misskey.entities.UserDetailed;
-	qrDataUrl: string;
-	paymentUrl?: string;
-	amountVnd: number;
+    user?: Misskey.entities.UserDetailed;
+    helpId?: string;
+    qrDataUrl: string;
+    paymentUrl?: string;
+    amountVnd: number;
 }>();
 
 const emit = defineEmits<{ (ev: 'closed'): void }>();
@@ -69,6 +70,8 @@ const pct = computed(() => Math.round((left.value / total) * 100));
 
 const paid = ref(false);
 let poll: ReturnType<typeof setInterval> | null = null;
+const isHelp = computed(() => !!props.helpId);
+const headerLabel = computed(() => isHelp.value ? 'Gói giúp đỡ' : i18n.ts.follow);
 
 onMounted(() => {
 	h = setInterval(() => {
@@ -80,15 +83,25 @@ onMounted(() => {
 	}, 1000);
 
 	poll = setInterval(async () => {
-		try {
-			const me = await misskeyApi<Misskey.entities.UserDetailed>('users/show', { userId: props.user.id });
-			if (me?.isFollowing) {
-				paid.value = true;
-				if (h) { clearInterval(h); h = null; }
-				if (poll) { clearInterval(poll); poll = null; }
-				setTimeout(() => { if (modal.value) modal.value.close(); }, 3000);
-			}
-		} catch {}
+    try {
+        if (props.helpId) {
+            const s = await misskeyApi('help/support-status', { id: props.helpId });
+            if (s?.unlocked) {
+                paid.value = true;
+                if (h) { clearInterval(h); h = null; }
+                if (poll) { clearInterval(poll); poll = null; }
+                setTimeout(() => { if (modal.value) modal.value.close(); }, 3000);
+            }
+        } else if (props.user) {
+            const me = await misskeyApi<Misskey.entities.UserDetailed>('users/show', { userId: props.user.id });
+            if (me?.isFollowing) {
+                paid.value = true;
+                if (h) { clearInterval(h); h = null; }
+                if (poll) { clearInterval(poll); poll = null; }
+                setTimeout(() => { if (modal.value) modal.value.close(); }, 3000);
+            }
+        }
+    } catch {}
 	}, 2000);
 });
 

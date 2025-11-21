@@ -26,6 +26,18 @@ export const ROUTE_DEF = [{
 	path: '/',
 	component: $i ? PageTimeline : page(() => import('@/pages/welcome.vue')),
 }, {
+    path: '/help',
+    component: page(() => import('@/pages/help.explore.vue')),
+}, {
+    path: '/help/create',
+    component: page(() => import('@/pages/help.create.vue')),
+}, {
+    path: '/help/my',
+    component: page(() => import('@/pages/help.my.vue')),
+}, {
+    path: '/help/:id',
+    component: page(() => import('@/pages/help.detail.vue')),
+}, {
 	path: '/timeline',
 	component: PageTimeline,
 }, {
@@ -470,6 +482,10 @@ export const ROUTE_DEF = [{
 		path: '/branding',
 		name: 'branding',
 		component: page(() => import('@/pages/admin/branding.vue')),
+	}, {
+		path: '/help',
+		name: 'admin_help',
+		component: page(() => import('@/pages/admin/help.vue')),
 	}, {
 		path: '/moderation',
 		name: 'moderation',

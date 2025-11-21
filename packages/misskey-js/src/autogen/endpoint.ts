@@ -360,6 +360,8 @@ import type {
 	FollowingDeleteResponse,
 	FollowingInvalidateRequest,
 	FollowingInvalidateResponse,
+	FollowingPurchaseRequest,
+	FollowingPurchaseResponse,
 	FollowingRequestsAcceptRequest,
 	FollowingRequestsCancelRequest,
 	FollowingRequestsCancelResponse,
@@ -368,6 +370,10 @@ import type {
 	FollowingRequestsRejectRequest,
 	FollowingRequestsSentRequest,
 	FollowingRequestsSentResponse,
+	FollowingSepayInitRequest,
+	FollowingSepayInitResponse,
+	FollowingSepayQrRequest,
+	FollowingSepayQrResponse,
 	FollowingUpdateRequest,
 	FollowingUpdateResponse,
 	FollowingUpdateAllRequest,
@@ -396,6 +402,27 @@ import type {
 	HashtagsTrendResponse,
 	HashtagsUsersRequest,
 	HashtagsUsersResponse,
+	HelpAdminListRequest,
+	HelpAdminListResponse,
+	HelpContribListRequest,
+	HelpContribListResponse,
+	HelpCreateRequest,
+	HelpCreateResponse,
+	HelpGiftConfirmRequest,
+	HelpGiftConfirmResponse,
+	HelpGiftReportRequest,
+	HelpGiftReportResponse,
+	HelpListRequest,
+	HelpListResponse,
+	HelpMySupportsResponse,
+	HelpShowRequest,
+	HelpShowResponse,
+	HelpSupportInitRequest,
+	HelpSupportInitResponse,
+	HelpSupportStatusRequest,
+	HelpSupportStatusResponse,
+	HelpUpdateStatusRequest,
+	HelpUpdateStatusResponse,
 	IResponse,
 	I2faDoneRequest,
 	I2faDoneResponse,
@@ -657,6 +684,8 @@ import type {
 	V2AdminEmojiListRequest,
 	V2AdminEmojiListResponse,
 	VerifyEmailRequest,
+	WebhooksSepayRequest,
+	WebhooksSepayResponse,
 } from './entities.js';
 
 export type Endpoints = {
@@ -892,11 +921,14 @@ export type Endpoints = {
 	'following/create': { req: FollowingCreateRequest; res: FollowingCreateResponse };
 	'following/delete': { req: FollowingDeleteRequest; res: FollowingDeleteResponse };
 	'following/invalidate': { req: FollowingInvalidateRequest; res: FollowingInvalidateResponse };
+	'following/purchase': { req: FollowingPurchaseRequest; res: FollowingPurchaseResponse };
 	'following/requests/accept': { req: FollowingRequestsAcceptRequest; res: EmptyResponse };
 	'following/requests/cancel': { req: FollowingRequestsCancelRequest; res: FollowingRequestsCancelResponse };
 	'following/requests/list': { req: FollowingRequestsListRequest; res: FollowingRequestsListResponse };
 	'following/requests/reject': { req: FollowingRequestsRejectRequest; res: EmptyResponse };
 	'following/requests/sent': { req: FollowingRequestsSentRequest; res: FollowingRequestsSentResponse };
+	'following/sepay-init': { req: FollowingSepayInitRequest; res: FollowingSepayInitResponse };
+	'following/sepay-qr': { req: FollowingSepayQrRequest; res: FollowingSepayQrResponse };
 	'following/update': { req: FollowingUpdateRequest; res: FollowingUpdateResponse };
 	'following/update-all': { req: FollowingUpdateAllRequest; res: EmptyResponse };
 	'gallery/featured': { req: GalleryFeaturedRequest; res: GalleryFeaturedResponse };
@@ -915,6 +947,17 @@ export type Endpoints = {
 	'hashtags/show': { req: HashtagsShowRequest; res: HashtagsShowResponse };
 	'hashtags/trend': { req: EmptyRequest; res: HashtagsTrendResponse };
 	'hashtags/users': { req: HashtagsUsersRequest; res: HashtagsUsersResponse };
+	'help/admin-list': { req: HelpAdminListRequest; res: HelpAdminListResponse };
+	'help/contrib-list': { req: HelpContribListRequest; res: HelpContribListResponse };
+	'help/create': { req: HelpCreateRequest; res: HelpCreateResponse };
+	'help/gift-confirm': { req: HelpGiftConfirmRequest; res: HelpGiftConfirmResponse };
+	'help/gift-report': { req: HelpGiftReportRequest; res: HelpGiftReportResponse };
+	'help/list': { req: HelpListRequest; res: HelpListResponse };
+	'help/my-supports': { req: EmptyRequest; res: HelpMySupportsResponse };
+	'help/show': { req: HelpShowRequest; res: HelpShowResponse };
+	'help/support-init': { req: HelpSupportInitRequest; res: HelpSupportInitResponse };
+	'help/support-status': { req: HelpSupportStatusRequest; res: HelpSupportStatusResponse };
+	'help/update-status': { req: HelpUpdateStatusRequest; res: HelpUpdateStatusResponse };
 	'i': { req: EmptyRequest; res: IResponse };
 	'i/2fa/done': { req: I2faDoneRequest; res: I2faDoneResponse };
 	'i/2fa/key-done': { req: I2faKeyDoneRequest; res: I2faKeyDoneResponse };
@@ -1092,6 +1135,7 @@ export type Endpoints = {
 	'users/update-memo': { req: UsersUpdateMemoRequest; res: EmptyResponse };
 	'v2/admin/emoji/list': { req: V2AdminEmojiListRequest; res: V2AdminEmojiListResponse };
 	'verify-email': { req: VerifyEmailRequest; res: EmptyResponse };
+	'webhooks/sepay': { req: WebhooksSepayRequest; res: WebhooksSepayResponse };
 };
 
 /**

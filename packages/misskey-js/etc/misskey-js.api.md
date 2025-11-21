@@ -1865,6 +1865,8 @@ declare namespace entities {
         FollowingDeleteResponse,
         FollowingInvalidateRequest,
         FollowingInvalidateResponse,
+        FollowingPurchaseRequest,
+        FollowingPurchaseResponse,
         FollowingRequestsAcceptRequest,
         FollowingRequestsCancelRequest,
         FollowingRequestsCancelResponse,
@@ -1873,6 +1875,10 @@ declare namespace entities {
         FollowingRequestsRejectRequest,
         FollowingRequestsSentRequest,
         FollowingRequestsSentResponse,
+        FollowingSepayInitRequest,
+        FollowingSepayInitResponse,
+        FollowingSepayQrRequest,
+        FollowingSepayQrResponse,
         FollowingUpdateRequest,
         FollowingUpdateResponse,
         FollowingUpdateAllRequest,
@@ -1901,6 +1907,27 @@ declare namespace entities {
         HashtagsTrendResponse,
         HashtagsUsersRequest,
         HashtagsUsersResponse,
+        HelpAdminListRequest,
+        HelpAdminListResponse,
+        HelpContribListRequest,
+        HelpContribListResponse,
+        HelpCreateRequest,
+        HelpCreateResponse,
+        HelpGiftConfirmRequest,
+        HelpGiftConfirmResponse,
+        HelpGiftReportRequest,
+        HelpGiftReportResponse,
+        HelpListRequest,
+        HelpListResponse,
+        HelpMySupportsResponse,
+        HelpShowRequest,
+        HelpShowResponse,
+        HelpSupportInitRequest,
+        HelpSupportInitResponse,
+        HelpSupportStatusRequest,
+        HelpSupportStatusResponse,
+        HelpUpdateStatusRequest,
+        HelpUpdateStatusResponse,
         IResponse,
         I2faDoneRequest,
         I2faDoneResponse,
@@ -2162,6 +2189,8 @@ declare namespace entities {
         V2AdminEmojiListRequest,
         V2AdminEmojiListResponse,
         VerifyEmailRequest,
+        WebhooksSepayRequest,
+        WebhooksSepayResponse,
         Error_2 as Error,
         UserLite,
         UserDetailedNotMeOnly,
@@ -2382,6 +2411,12 @@ type FollowingInvalidateRequest = operations['following___invalidate']['requestB
 type FollowingInvalidateResponse = operations['following___invalidate']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+type FollowingPurchaseRequest = operations['following___purchase']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type FollowingPurchaseResponse = operations['following___purchase']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type FollowingRequestsAcceptRequest = operations['following___requests___accept']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -2404,6 +2439,18 @@ type FollowingRequestsSentRequest = operations['following___requests___sent']['r
 
 // @public (undocumented)
 type FollowingRequestsSentResponse = operations['following___requests___sent']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type FollowingSepayInitRequest = operations['following___sepay-init']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type FollowingSepayInitResponse = operations['following___sepay-init']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type FollowingSepayQrRequest = operations['following___sepay-qr']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type FollowingSepayQrResponse = operations['following___sepay-qr']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type FollowingUpdateAllRequest = operations['following___update-all']['requestBody']['content']['application/json'];
@@ -2497,6 +2544,69 @@ type HashtagsUsersRequest = operations['hashtags___users']['requestBody']['conte
 
 // @public (undocumented)
 type HashtagsUsersResponse = operations['hashtags___users']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpAdminListRequest = operations['help___admin-list']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpAdminListResponse = operations['help___admin-list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpContribListRequest = operations['help___contrib-list']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpContribListResponse = operations['help___contrib-list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpCreateRequest = operations['help___create']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpCreateResponse = operations['help___create']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpGiftConfirmRequest = operations['help___gift-confirm']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpGiftConfirmResponse = operations['help___gift-confirm']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpGiftReportRequest = operations['help___gift-report']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpGiftReportResponse = operations['help___gift-report']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpListRequest = operations['help___list']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpListResponse = operations['help___list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpMySupportsResponse = operations['help___my-supports']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpShowRequest = operations['help___show']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpShowResponse = operations['help___show']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpSupportInitRequest = operations['help___support-init']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpSupportInitResponse = operations['help___support-init']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpSupportStatusRequest = operations['help___support-status']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpSupportStatusResponse = operations['help___support-status']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type HelpUpdateStatusRequest = operations['help___update-status']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type HelpUpdateStatusResponse = operations['help___update-status']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type I2faDoneRequest = operations['i___2fa___done']['requestBody']['content']['application/json'];
@@ -3858,6 +3968,12 @@ type V2AdminEmojiListResponse = operations['v2___admin___emoji___list']['respons
 
 // @public (undocumented)
 type VerifyEmailRequest = operations['verify-email']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type WebhooksSepayRequest = operations['webhooks___sepay']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type WebhooksSepayResponse = operations['webhooks___sepay']['responses']['200']['content']['application/json'];
 
 // Warnings were encountered during analysis:
 //

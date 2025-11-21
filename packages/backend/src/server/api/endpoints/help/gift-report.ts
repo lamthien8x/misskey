@@ -1,0 +1,38 @@
+import ms from 'ms';
+import { Inject, Injectable } from '@nestjs/common';
+import { Endpoint } from '@/server/api/endpoint-base.js';
+import { DI } from '@/di-symbols.js';
+import type { Config } from '@/config.js';
+import * as Redis from 'ioredis';
+import { ApiError } from '../../error.js';
+
+export const meta = {
+  tags: ['help','payments','admin'],
+  limit: { duration: ms('1min'), max: 60 },
+  requireCredential: true,
+  kind: 'write:help',
+  res: {
+    type: 'object', optional: false, nullable: false,
+    properties: { ok: { type: 'boolean' } },
+  },
+  errors: {
+    notFound: { message: 'Not found', code: 'NOT_FOUND', id: 'c0b8b90c-0a37-4b87-8faa-63a20c5f4520' },
+  },
+} as const;
+
+export const paramDef = { type: 'object', properties: { id: { type: 'string' }, reason: { type: 'string', nullable: true } }, required: ['id'] } as const;
+
+@Injectable()
+export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
+  constructor(
+    @Inject(DI.config) private config: Config,
+    @Inject(DI.redis) private redis: Redis.Redis,
+  ) {
+    super(meta, paramDef, async (ps, me) => {
+      const s = await this.redis.get(`help:package:${ps.id}`);
+      if (!s) throw new ApiError(meta.errors.notFound);
+      await this.redis.set(`help:gift:report:${ps.id}:${me.id}`, JSON.stringify({ at: Date.now(), reason: ps.reason ?? '' }));
+      return { ok: true };
+    });
+  }
+}
