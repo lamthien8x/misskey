@@ -191,6 +191,7 @@ export const PREF_DEF = definePreferences({
 			'drive',
 			'followRequests',
 			'chat',
+			'help',
 			'-',
 			'explore',
 			'announcements',

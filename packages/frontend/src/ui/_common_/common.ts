@@ -54,56 +54,6 @@ export function openInstanceMenu(ev: MouseEvent) {
 	const menuItems: MenuItem[] = [];
 
 	menuItems.push({
-		text: instance.name ?? host,
-		type: 'label',
-	}, {
-		type: 'link',
-		text: i18n.ts.instanceInfo,
-		icon: 'ti ti-info-circle',
-		to: '/about',
-	}, {
-		type: 'link',
-		text: i18n.ts.customEmojis,
-		icon: 'ti ti-icons',
-		to: '/about#emojis',
-	});
-
-	if (instance.federation !== 'none') {
-		menuItems.push({
-			type: 'link',
-			text: i18n.ts.federation,
-			icon: 'ti ti-whirl',
-			to: '/about#federation',
-		});
-	}
-
-	menuItems.push({
-		type: 'link',
-		text: i18n.ts.charts,
-		icon: 'ti ti-chart-line',
-		to: '/about#charts',
-	}, { type: 'divider' }, {
-		type: 'link',
-		text: i18n.ts.ads,
-		icon: 'ti ti-ad',
-		to: '/ads',
-	});
-
-	if ($i && ($i.isAdmin || $i.policies.canInvite) && instance.disableRegistration) {
-		menuItems.push({
-			type: 'link',
-			to: '/invite',
-			text: i18n.ts.invite,
-			icon: 'ti ti-user-plus',
-		});
-	}
-
-	menuItems.push({
-		type: 'parent',
-		text: i18n.ts.tools,
-		icon: 'ti ti-tool',
-		children: toolsMenuItems(),
-	}, { type: 'divider' }, {
 		type: 'link',
 		text: i18n.ts.inquiry,
 		icon: 'ti ti-help-circle',
@@ -139,36 +89,6 @@ export function openInstanceMenu(ev: MouseEvent) {
 			target: '_blank',
 		});
 	}
-
-	if (instance.impressumUrl != null || instance.tosUrl != null || instance.privacyPolicyUrl != null) {
-		menuItems.push({ type: 'divider' });
-	}
-
-	menuItems.push({
-		type: 'a',
-		text: i18n.ts.document,
-		icon: 'ti ti-bulb',
-		href: 'https://misskey-hub.net/docs/for-users/',
-		target: '_blank',
-	});
-
-	if ($i) {
-		menuItems.push({
-			text: i18n.ts._initialTutorial.launchTutorial,
-			icon: 'ti ti-presentation',
-			action: async () => {
-				const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkTutorialDialog.vue').then(x => x.default), {}, {
-					closed: () => dispose(),
-				});
-			},
-		});
-	}
-
-	menuItems.push({
-		type: 'link',
-		text: i18n.ts.aboutMisskey,
-		to: '/about-misskey',
-	});
 
 	os.popupMenu(menuItems, ev.currentTarget ?? ev.target, {
 		align: 'left',
