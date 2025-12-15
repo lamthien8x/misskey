@@ -63,13 +63,19 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const users = await this.usersRepository.findBy({ id: In(Array.from(supporterIds)) });
 			const packedUsers = await this.userEntityService.packMany(users, me ?? null);
 
-			const items = contribs.map(c => {
+			const items: any[] = [];
+			for (const c of contribs) {
 				const user = packedUsers.find(u => u.id === c.supporterId);
-				return {
+				const confirmStr = await this.redis.get(`help:gift:confirm:${ps.id}:${c.supporterId}`);
+				const reportStr = await this.redis.get(`help:gift:report:${ps.id}:${c.supporterId}`);
+				items.push({
 					...c,
 					user: user ?? null,
-				};
-			});
+					hasConfirmed: !!confirmStr,
+					hasReported: !!reportStr,
+					reportReason: reportStr ? JSON.parse(reportStr).reason : null,
+				});
+			}
 
 			return { items };
 		});

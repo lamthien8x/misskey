@@ -26,17 +26,17 @@ export const ROUTE_DEF = [{
 	path: '/',
 	component: $i ? PageTimeline : page(() => import('@/pages/welcome.vue')),
 }, {
-    path: '/help',
-    component: page(() => import('@/pages/help.explore.vue')),
+	path: '/help',
+	component: page(() => import('@/pages/help.explore.vue')),
 }, {
-    path: '/help/create',
-    component: page(() => import('@/pages/help.create.vue')),
+	path: '/help/create',
+	component: page(() => import('@/pages/help.create.vue')),
 }, {
-    path: '/help/my',
-    component: page(() => import('@/pages/help.my.vue')),
+	path: '/help/my',
+	component: page(() => import('@/pages/help.my.vue')),
 }, {
-    path: '/help/:id',
-    component: page(() => import('@/pages/help.detail.vue')),
+	path: '/help/:id',
+	component: page(() => import('@/pages/help.detail.vue')),
 }, {
 	path: '/timeline',
 	component: PageTimeline,
@@ -235,9 +235,7 @@ export const ROUTE_DEF = [{
 	path: '/contact',
 	component: page(() => import('@/pages/contact.vue')),
 }, {
-	path: '/about-misskey',
-	component: page(() => import('@/pages/about-misskey.vue')),
-}, {
+
 	path: '/invite',
 	name: 'invite',
 	component: page(() => import('@/pages/invite.vue')),
@@ -486,6 +484,10 @@ export const ROUTE_DEF = [{
 		path: '/help',
 		name: 'admin_help',
 		component: page(() => import('@/pages/admin/help.vue')),
+	}, {
+		path: '/help/:id',
+		name: 'admin_help_detail',
+		component: page(() => import('@/pages/admin/help.detail.vue')),
 	}, {
 		path: '/moderation',
 		name: 'moderation',
